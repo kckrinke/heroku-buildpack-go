@@ -159,6 +159,73 @@ loadEnvDir() {
     fi
 }
 
+clearGitCredHelper() {
+    git config --global --unset credential.helper
+}
+
+setGitCredHelper() {
+    git config --global credential.helper '!#GoGitCredHelper
+    env_dir="'$(cd ${1}/ && pwd)'"
+    gitCredHelper() {
+    echo "${1}\n" >&2 #debug
+    case "${1}" in
+        setup|erase) # Read only, so ignore
+        ;;
+        get)
+            local protocol=""
+            local host=""
+            local username=""
+            local password=""
+            local key=""
+            local value=""
+            while read LINE; do
+                key=$(echo $LINE | cut -d = -f 1)
+                value=$(echo $LINE | cut -d = -f 2)
+                case "${key}" in
+                    protocol)
+                        protocol="$(echo ${value} | sed -e "s/.*/\U&/")"
+                    ;;
+                    host)
+                        host="$(echo ${value} | sed -e "s/\./__/" -e "s/.*/\U&/")"
+                    ;;
+                    username)
+                        username="${value}"
+                    ;;
+                    password)
+                        password="${value}"
+                    ;;
+                    *)
+                        echo "Unsupported key: ${key}=${value}" >&2
+                        exit 1
+                    ;;
+                esac
+                echo LINE=$LINE >&2    #debug
+                echo key=$key >&2      #debug
+                echo value=$value >&2  #debug
+            done
+            local f="${env_dir}/GO_GIT_CRED__${protocol}__${host}"
+            echo f=${f} >&2  #debug
+            echo >&2         #debug
+            if [ -f "${f}" ]; then
+                echo "Using credentials from GO_GIT_CRED__${protocol}__${host}" >&2
+                t=$(cat ${f})
+                if [[ "${t}" =~ ":" ]]; then
+                    username="$(echo $t | cut -d : -f 1)"
+                    password="$(echo $t | cut -d : -f 2)"
+                else
+                    username="${t}"
+                    password="x-oauth-basic"
+                fi
+                echo username=${username}
+                echo username=${username} >&2  #debug
+                echo password=${password}
+                echo password=${password} >&2  #debug
+            fi
+        ;;
+    esac
+}; gitCredHelper'
+}
+
 setGoVersionFromEnvironment() {
     if [ -z "${GOVERSION}" ]; then
         warn ""

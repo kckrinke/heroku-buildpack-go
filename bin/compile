@@ -386,7 +386,10 @@ fi
 
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
+    echo "Go Linker Symbol: ${GO_LINKER_SYMBOL}=${GO_LINKER_VALUE}"
     LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
+else
+    echo "Skipping linker symbol"
 fi
 
 function prepare_ldflags () {
@@ -411,7 +414,12 @@ function prepare_ldflags () {
 
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
+    echo "Preparing flags"
     FLAGS=("${FLAGS[@]}" -ldflags "$(prepare_ldflags "${LDFLAGS[@]}")")
+    echo -n "Flags: "
+    echo "${FLAGS[@]}"
+else
+    echo "No LDFLAGS found."
 fi
 
 export GOPATH

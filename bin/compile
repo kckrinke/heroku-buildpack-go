@@ -365,46 +365,49 @@ ensureGo "${ver}"
 
 mkdir -p "${build}/bin"
 
-# If $GO_LINKER_SYMBOL and GO_LINKER_VALUE are set, tell the linker to DTRT
-FLAGS=(-tags heroku)
-LDFLAGS=()
-if [ -n "${GO_BUILD_TIMESTAMP}" ]
-then
-    timestamp=$(date "+%Y-%m-%d_%H:%M:%S")
-    LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_TIMESTAMP}" "${timestamp}")
-fi
-if [ -n "${GO_BUILD_COMMIT}" ]
-then
-    LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_COMMIT}" "(heroku)")
-fi
-if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
-then
-    LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
-fi
-
-function prepare_ldflags () {
-    ldstr=""
+# Given a list of k->v pairs, construct a linker flags string
+function prepare_ldflags_value () {
+    ret_val=""
     while [ $# -gt 0 ]
     do
         k=${1}
         v=${2}
         case "${ver}" in
             go1.0*|go1.1*|go1.2*|go1.3*|go1.4*)
-                ldstr="${ldstr} -X ${k} '${v}'"
+                ret_val="${ret_val} -X ${k} '${v}'"
                 ;;
             *)
-                ldstr="${ldstr} -X '${k}=${v}'"
+                ret_val="${ret_val} -X '${k}=${v}'"
                 ;;
         esac
         shift
         shift
     done
-    echo "${ldstr}"
+    echo "${ret_val}"
 }
 
+# Determine a list of flags to use with the go build call
+FLAGS=(-tags heroku)
+# Specifically figure out the LDFLAGS values
+LDFLAGS=()
+if [ -n "${GO_BUILD_STAMP}" ]
+then
+    # GO_BUILD_STAMP's value is actually the name of the Go variable to have
+    # ldflags set with a datestamp of "now".
+    timestamp=$(date --utc "+%Y-%m-%d %H:%M:%S")
+    LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_STAMP}" "${timestamp}")
+fi
+if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
+then
+    # These pair of variables are the only way to provide a key,value to the
+    # go linker system. Only permits a single "-X 'symbol=value'" argument.
+    LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
+fi
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
-    ldvals=$(prepare_ldflags "${LDFLAGS[@]}")
+    # Actually add the LDFLAGS argument to the FLAGS list using a helper
+    # function to get the assignments and string quoting setup correctly. 
+    ldvals=$(prepare_ldflags_value "${LDFLAGS[@]}")
     FLAGS=("${FLAGS[@]}" -ldflags "${ldvals}")
 fi
 

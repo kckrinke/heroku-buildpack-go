@@ -390,7 +390,7 @@ function prepare_ldflags () {
         v=${2}
         case "${ver}" in
             go1.0*|go1.1*|go1.2*|go1.3*|go1.4*)
-                ldstr="${ldstr} -X ${k} ${v}"
+                ldstr="${ldstr} -X ${k} '${v}'"
                 ;;
             *)
                 ldstr="${ldstr} -X ${k}='${v}'"
@@ -404,7 +404,8 @@ function prepare_ldflags () {
 
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
-    FLAGS=("${FLAGS[@]}" -ldflags "$(prepare_ldflags "${LDFLAGS[@]}")")
+    ldvals=$(prepare_ldflags "${LDFLAGS[@]}")
+    FLAGS=("${FLAGS[@]}" -ldflags "${ldvals}")
 fi
 
 export GOPATH

@@ -140,6 +140,8 @@ loadEnvDir() {
     envFlags+=("CGO_LDFLAGS")
     envFlags+=("GO_LINKER_SYMBOL")
     envFlags+=("GO_LINKER_VALUE")
+    envFlags+=("GO_BUILD_TIMESTAMP")
+    envFlags+=("GO_BUILD_COMMIT")
     envFlags+=("GO15VENDOREXPERIMENT")
     envFlags+=("GOVERSION")
     envFlags+=("GO_INSTALL_PACKAGE_SPEC")
@@ -153,6 +155,7 @@ loadEnvDir() {
         env_dir=$(cd "${env_dir}/" && pwd)
         for key in ${envFlags[@]}; do
             if [ -f "${env_dir}/${key}" ]; then
+                echo "exporting: ${key}"
                 export "${key}=$(cat "${env_dir}/${key}" | sed -e "s:\${build_dir}:${build}:")"
             fi
         done

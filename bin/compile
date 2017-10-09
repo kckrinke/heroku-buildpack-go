@@ -368,12 +368,13 @@ mkdir -p "${build}/bin"
 # If $GO_LINKER_SYMBOL and GO_LINKER_VALUE are set, tell the linker to DTRT
 FLAGS=(-tags heroku)
 LDFLAGS=()
-[ -f "${env_dir}/GO_BUILD_TIMESTAMP" ] && \
-    LDFLAGS=("${LDFLAGS[@]}" "$(cat ${env_dir}/GO_BUILD_TIMESTAMP)" "$(date "+%Y-%m-%d_%H:%M:%S")")
-[ -f "${env_dir}/GO_BUILD_COMMIT" ] && \
-    LDFLAGS=("${LDFLAGS[@]}" "$(cat ${env_dir}/GO_BUILD_COMMIT)" "$(cd "${build}"; git rev-parse HEAD 2>/dev/null)")
-[ -f "${env_dir}/GO_LINKER_SYMBOL" -a -f "${env_dir}/GO_LINKER_VALUE" ] && \
-    LDFLAGS=("${LDFLAGS[@]}" "$(cat ${env_dir}/GO_LINKER_SYMBOL)" "$(cat ${env_dir}/GO_LINKER_VALUE)")
+ls -hal $env_dir
+[ -n "${GO_BUILD_TIMESTAMP}" ] && \
+    LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_TIMESTAMP}" "$(date "+%Y-%m-%d_%H:%M:%S")")
+[ -n "${GO_BUILD_COMMIT}" ] && \
+    LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_COMMIT}" "$(cd "${build}"; git rev-parse HEAD 2>/dev/null)")
+[ -f "${GO_LINKER_SYMBOL}" -a -f "${GO_LINKER_VALUE}" ] && \
+    LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
 
 function prepare_ldflags () {
     ldstr=""

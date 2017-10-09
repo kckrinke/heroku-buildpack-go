@@ -370,6 +370,7 @@ FLAGS=(-tags heroku)
 LDFLAGS=()
 if [ -n "${GO_BUILD_TIMESTAMP}" ]
 then
+    echo "Build timestamp: ${GO_BUILD_TIMESTAMP}"
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_TIMESTAMP}" "$(date "+%Y-%m-%d_%H:%M:%S")")
 else
     echo "Skipping build timestamp."
@@ -377,6 +378,7 @@ fi
 
 if [ -n "${GO_BUILD_COMMIT}" ]
 then
+    echo "Build commit: ${GO_BUILD_COMMIT}"
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_COMMIT}" "$(cd "${build}"; git rev-parse HEAD 2>/dev/null)")
 else
     echo "Skipping build commit"
@@ -385,8 +387,6 @@ fi
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
     LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
-else
-    echo "Skipping linker symbol"
 fi
 
 function prepare_ldflags () {

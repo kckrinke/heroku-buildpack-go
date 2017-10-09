@@ -369,27 +369,18 @@ mkdir -p "${build}/bin"
 FLAGS=(-tags heroku)
 # Specifically figure out the LDFLAGS values
 LDFLAGS=()
-GO_BUILD_STAMP=$(getEnvVal "${env_dir}" "GO_BUILD_STAMP")
 if [ -n "${GO_BUILD_STAMP}" ]
 then
     # GO_BUILD_STAMP's value is actually the name of the Go variable to have
     # ldflags set with a datestamp of "now".
     timestamp=$(date --utc "+%Y-%m-%d %H:%M:%S")
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_STAMP}" "${timestamp}")
-    echo "Setting variable '${GO_BUILD_STAMP}' to '${timestamp}'"
-else
-    echo "Skipping GO_BUILD_STAMP"
 fi
-GO_LINKER_SYMBOL=$(getEnvVal "${env_dir}" "GO_LINKER_SYMBOL")
-GO_LINKER_VALUE=$(getEnvVal "${env_dir}" "GO_LINKER_VALUE")
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
     # These pair of variables are the only way to provide a key,value to the
     # go linker system. Only permits a single "-X 'symbol=value'" argument.
     LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
-    echo "Setting variable '${GO_LINKER_SYMBOL}' to '${GO_LINKER_VALUE}'"
-else
-    echo "Skipping GO_LINKER_SYMBOL"
 fi
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
@@ -397,9 +388,6 @@ then
     # function to get the assignments and string quoting setup correctly. 
     ldvals=$(joinLinkerFlags "${LDFLAGS[@]}")
     FLAGS=("${FLAGS[@]}" -ldflags "${ldvals}")
-    echo "Settings found and flagged."
-else
-    echo "No flag settings found."
 fi
 
 export GOPATH

@@ -396,12 +396,14 @@ then
     # ldflags set with a datestamp of "now".
     timestamp=$(date --utc "+%Y-%m-%d %H:%M:%S")
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_STAMP}" "${timestamp}")
+    echo "Setting variable '${GO_BUILD_STAMP}' to '${timestamp}'"
 fi
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
     # These pair of variables are the only way to provide a key,value to the
     # go linker system. Only permits a single "-X 'symbol=value'" argument.
     LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
+    echo "Setting variable '${GO_LINKER_SYMBOL}' to '${GO_LINKER_VALUE}'"
 fi
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
@@ -409,6 +411,9 @@ then
     # function to get the assignments and string quoting setup correctly. 
     ldvals=$(prepare_ldflags_value "${LDFLAGS[@]}")
     FLAGS=("${FLAGS[@]}" -ldflags "${ldvals}")
+    echo "Settings found and flagged."
+else
+    echo "No flag settings found."
 fi
 
 export GOPATH

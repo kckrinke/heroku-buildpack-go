@@ -369,6 +369,7 @@ mkdir -p "${build}/bin"
 FLAGS=(-tags heroku)
 # Specifically figure out the LDFLAGS values
 LDFLAGS=()
+GO_BUILD_STAMP=$(getEnvVal "${env_dir}" "GO_BUILD_STAMP")
 if [ -n "${GO_BUILD_STAMP}" ]
 then
     # GO_BUILD_STAMP's value is actually the name of the Go variable to have
@@ -379,6 +380,8 @@ then
 else
     echo "Skipping GO_BUILD_STAMP"
 fi
+GO_LINKER_SYMBOL=$(getEnvVal "${env_dir}" "GO_LINKER_SYMBOL")
+GO_LINKER_VALUE=$(getEnvVal "${env_dir}" "GO_LINKER_VALUE")
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
     # These pair of variables are the only way to provide a key,value to the

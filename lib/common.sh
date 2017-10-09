@@ -162,8 +162,19 @@ loadEnvDir() {
     fi
 }
 
+getEnvVal() {
+    local env_dir="${1}"
+    local key="${2}"
+    local tgt="${env_dir}/${key}"
+    if [ -f "${tgt}" ]
+    then
+        cat "${tgt}" | sed -e "s:\${build_dir}:${build}:"
+    fi
+    echo ""
+}
+
 joinLinkerFlags() {
-    ret_val=""
+    local ret_val="${1}"
     while [ $# -gt 0 ]
     do
         k=${1}

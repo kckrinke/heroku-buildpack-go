@@ -368,6 +368,8 @@ mkdir -p "${build}/bin"
 # If $GO_LINKER_SYMBOL and GO_LINKER_VALUE are set, tell the linker to DTRT
 FLAGS=(-tags heroku)
 LDFLAGS=()
+echo -n "EXPORTS: "
+export
 echo "GO_BUILD_TIMESTAMP: \"${GO_BUILD_TIMESTAMP}\""
 [ -n "${GO_BUILD_TIMESTAMP}" ] && \
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_TIMESTAMP}"   "$(date "+%Y-%m-%d_%H:%M:%S")")

@@ -162,6 +162,26 @@ loadEnvDir() {
     fi
 }
 
+joinLinkerFlags() {
+    ret_val=""
+    while [ $# -gt 0 ]
+    do
+        k=${1}
+        v=${2}
+        case "${ver}" in
+            go1.0*|go1.1*|go1.2*|go1.3*|go1.4*)
+                ret_val="${ret_val} -X ${k} '${v}'"
+                ;;
+            *)
+                ret_val="${ret_val} -X '${k}=${v}'"
+                ;;
+        esac
+        shift
+        shift
+    done
+    echo "${ret_val}"
+}
+
 setGoVersionFromEnvironment() {
     if [ -z "${GOVERSION}" ]; then
         warn ""

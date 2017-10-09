@@ -365,27 +365,6 @@ ensureGo "${ver}"
 
 mkdir -p "${build}/bin"
 
-# Given a list of k->v pairs, construct a linker flags string
-function prepare_ldflags_value () {
-    ret_val=""
-    while [ $# -gt 0 ]
-    do
-        k=${1}
-        v=${2}
-        case "${ver}" in
-            go1.0*|go1.1*|go1.2*|go1.3*|go1.4*)
-                ret_val="${ret_val} -X ${k} '${v}'"
-                ;;
-            *)
-                ret_val="${ret_val} -X '${k}=${v}'"
-                ;;
-        esac
-        shift
-        shift
-    done
-    echo "${ret_val}"
-}
-
 # Determine a list of flags to use with the go build call
 FLAGS=(-tags heroku)
 # Specifically figure out the LDFLAGS values
@@ -397,6 +376,8 @@ then
     timestamp=$(date --utc "+%Y-%m-%d %H:%M:%S")
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_STAMP}" "${timestamp}")
     echo "Setting variable '${GO_BUILD_STAMP}' to '${timestamp}'"
+else
+    echo "Skipping GO_BUILD_STAMP"
 fi
 if [ -n "${GO_LINKER_SYMBOL}" -a -n "${GO_LINKER_VALUE}" ]
 then
@@ -404,12 +385,14 @@ then
     # go linker system. Only permits a single "-X 'symbol=value'" argument.
     LDFLAGS=("${LDFLAGS[@]}" "${GO_LINKER_SYMBOL}" "${GO_LINKER_VALUE}")
     echo "Setting variable '${GO_LINKER_SYMBOL}' to '${GO_LINKER_VALUE}'"
+else
+    echo "Skipping GO_LINKER_SYMBOL"
 fi
 if [ ${#LDFLAGS[@]} -gt 0 ]
 then
     # Actually add the LDFLAGS argument to the FLAGS list using a helper
     # function to get the assignments and string quoting setup correctly. 
-    ldvals=$(prepare_ldflags_value "${LDFLAGS[@]}")
+    ldvals=$(joinLinkerFlags "${LDFLAGS[@]}")
     FLAGS=("${FLAGS[@]}" -ldflags "${ldvals}")
     echo "Settings found and flagged."
 else

@@ -173,7 +173,7 @@ getEnvVal() {
 }
 
 joinLinkerFlags() {
-    local ret_val="${1}"
+    local ret_val=""
     while [ $# -gt 0 ]
     do
         k=${1}

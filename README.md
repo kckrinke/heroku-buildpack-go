@@ -248,6 +248,30 @@ pushing code. If `GO_LINKER_SYMBOL` is set, but `GO_LINKER_VALUE` isn't set then
 This can be used to embed the commit sha, or other build specific data directly
 into the compiled executable.
 
+## Automatic build timestamp and commit SHA
+
+This buildpack also supports the automatic setting of build datestamp and git
+commit SHA variables. This can be utilized by creating two variables in the main
+package, such as:
+
+```
+var (
+  BUILD_TIME string
+  BUILD_COMMIT string
+)
+```
+
+Then, set two environment variables within the heroku application:
+
+```
+GO_BUILD_TIMESTAMP="main.BUILD_TIME"
+GO_BUILD_COMMIT="main.BUILD_COMMIT"
+```
+
+Note the use of the package name in addition to the variable names. When deployed
+this buildpack will populate the BUILD_TIME and BUILD_COMMIT variables used at
+the time of deployment.
+
 ## Testpack
 
 This buildpack also supports the testpack API.

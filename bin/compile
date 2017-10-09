@@ -379,7 +379,6 @@ fi
 if [ -n "${GO_BUILD_COMMIT}" ]
 then
     echo "Build commit: ${GO_BUILD_COMMIT}"
-    cd ${build}
     commit=$(git rev-parse HEAD)
     LDFLAGS=("${LDFLAGS[@]}" "${GO_BUILD_COMMIT}" "${commit}")
     echo "Build commit: fin"

@@ -393,7 +393,7 @@ function prepare_ldflags () {
                 ldstr="${ldstr} -X ${k} '${v}'"
                 ;;
             *)
-                ldstr="${ldstr} -X ${k}='${v}'"
+                ldstr="${ldstr} -X '${k}=${v}'"
                 ;;
         esac
         shift
